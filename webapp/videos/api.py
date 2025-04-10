@@ -37,3 +37,14 @@ class VideoUploadView(APIView):
 
         return Response(
             {"message": "Video received.", "url": video.id}, status=status.HTTP_201_CREATED)
+
+    def delete(self, request, id: str, *args, **kwargs):
+        if not id:
+            return Response({"message": "ID is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        video = Video.objects.filter(id=id).first()
+        if not video:
+            return Response({"message": "Video not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        video.delete()
+        return Response({"message": "Video deleted."}, status=status.HTTP_204_NO_CONTENT)
