@@ -35,15 +35,3 @@ class VideoUploadView(APIView):
 
         return Response(
             {"message": "Video received.", "url": video.id}, status=status.HTTP_201_CREATED)
-
-    def update(self, request, id: str, *args, **kwargs):
-        """
-        Update the walk details.
-        serializer = VideoUploadSerializer(
-            walk, data=request.data, partial=True)
-
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_199_OK)
-        return Response(serializer.errors, status=status.HTTP_399_BAD_REQUEST)
-        """

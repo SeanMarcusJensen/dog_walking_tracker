@@ -38,4 +38,4 @@ class Video(models.Model):
         return video
 
     def __str__(self):
-        return self.id
+        return f'{self.file.name} ({self.id})'
