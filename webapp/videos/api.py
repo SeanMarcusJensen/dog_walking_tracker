@@ -33,5 +33,7 @@ class VideoUploadView(APIView):
         video_file = serializer.validated_data['video']
         video = Video.create_from_file(video_file)
 
+        # TODO: Notify on topic for video upload or let AI use polling or so.
+
         return Response(
             {"message": "Video received.", "url": video.id}, status=status.HTTP_201_CREATED)

@@ -13,14 +13,14 @@ class Walk(models.Model):
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
 
-    def __str__(self):
-        return self.start_time.strftime("%Y-%m-%d %H:%M:%S")
-
     def get_duration(self):
         """
         Calculate the duration of the walk.
         """
         return self.end_time - self.start_time
+
+    def __str__(self):
+        return self.start_time.strftime("%Y-%m-%d %H:%M:%S")
 
 
 class WalkEvent(models.Model):

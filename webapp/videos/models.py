@@ -12,7 +12,6 @@ class Video(models.Model):
     id = models.AutoField(primary_key=True)
     file = models.FileField(
         upload_to='uploads/', storage=default_storage)
-    # video_file = models.FilePathField()
     video_size = models.BigIntegerField()
     extension = models.CharField(max_length=10, default='mp4')
     created_at = models.DateTimeField(auto_now_add=True)
