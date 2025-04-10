@@ -21,4 +21,5 @@ app_name = 'walks'
 
 urlpatterns = [
     path('register/', api.VideoUploadView.as_view(), name='register'),
+    path('video/<str:id>', api.VideoUploadView.as_view(), name='get_video'),
 ]
