@@ -15,8 +15,11 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.urls import path
+from . import api
 
-app_name = 'walks'
+app_name = 'videos'
 
 urlpatterns = [
+    path('upload/', api.VideoUploadView.as_view(), name='upload'),
+    path('<int:id>/', api.VideoUploadView.as_view(), name='get_by_id'),
 ]

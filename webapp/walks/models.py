@@ -3,21 +3,6 @@ from django.db import models
 # Create your models here.
 
 
-class Video(models.Model):
-    """
-    Model representing a video.
-    """
-    id = models.AutoField(primary_key=True)
-    video_file = models.FilePathField()
-    video_size = models.BigIntegerField()
-    video_duration = models.IntegerField()
-    extension = models.CharField(max_length=10, default='mp4')
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return self.video_file
-
-
 class Walk(models.Model):
     """
     Model representing a walk.
@@ -27,7 +12,6 @@ class Walk(models.Model):
     #     'auth.User', related_name='walks', on_delete=models.CASCADE)
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
-    video_name = models.FilePathField()
 
     def __str__(self):
         return self.start_time.strftime("%Y-%m-%d %H:%M:%S")
