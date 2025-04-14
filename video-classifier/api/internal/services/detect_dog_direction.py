@@ -7,12 +7,13 @@ from ultralytics import YOLO
 model = YOLO("yolo11n.pt")
 
 
-def detect_dog_direction(video_path):
+def detect_dog_direction(video_path, debug=False):
     cap = cv2.VideoCapture(video_path)
     frame_width = int(cap.get(3))
     frame_height = int(cap.get(4))
 
-    door_line_y = frame_height // 2  # Define door threshold (center line)
+    # Define door threshold (center line)
+    door_line_y = frame_height // 2 + 100
     previous_positions = []
 
     while True:
@@ -42,14 +43,16 @@ def detect_dog_direction(video_path):
             previous_positions.append(cy)
 
         # Finalize for debug(optional)
-        cv2.line(frame, (0, door_line_y),
-                 (frame_width, door_line_y), (255, 0, 0), 2)
-        cv2.imshow("Tracking", frame)
-        if cv2.waitKey(1) == ord('q'):
-            break
+        if debug:
+            cv2.line(frame, (0, door_line_y),
+                     (frame_width, door_line_y), (255, 0, 0), 2)
+            cv2.imshow("Tracking", frame)
+            if cv2.waitKey(1) == ord('q'):
+                break
 
     cap.release()
-    cv2.destroyAllWindows()
+    if debug:
+        cv2.destroyAllWindows()
 
     # Decide movement direction
     if len(previous_positions) < 2:
