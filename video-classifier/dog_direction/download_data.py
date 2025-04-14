@@ -1,6 +1,10 @@
 import os
 DATA_FOLDER = os.path.join(os.path.dirname(__file__), 'dataset')
 
+IMAGES_URL = 'http://vision.stanford.edu/aditya86/ImageNetDogs/images.tar'
+ANOT_URL = 'http://vision.stanford.edu/aditya86/ImageNetDogs/annotation.tar'
+
+
 # Check if the directory exists, if not, create it
 if not os.path.exists(DATA_FOLDER):
     os.makedirs(DATA_FOLDER)
@@ -29,5 +33,4 @@ def download_package(url):
     print(f"Downloaded and extracted {filename}")
 
 if __name__ == '__main__':
-    DOG_DIRECTION_URL = "https://www.kaggle.com/datasets/rtatman/dog-breed-identification/download"
-    download_package(DOG_DIRECTION_URL)
+    download_package(IMAGES_URL)

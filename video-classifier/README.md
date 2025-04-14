@@ -4,4 +4,14 @@
 
 Django serving - sending model to this for storage.
 
-## model_training
+## Models
+
+Static model_files
+
+## Dog-Direction
+
+> YOLO model
+
+### Datasets
+
+(STANFORD DOGS DATASET)[http://vision.stanford.edu/aditya86/ImageNetDogs/]
