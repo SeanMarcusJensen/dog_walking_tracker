@@ -2,7 +2,7 @@
 
 ## API
 
-Django serving - sending model to this for storage.
+FastAPI.
 
 ## Models
 
@@ -15,3 +15,6 @@ Static model_files
 ### Datasets
 
 (STANFORD DOGS DATASET)[http://vision.stanford.edu/aditya86/ImageNetDogs/]
+
+
+https://docs.ultralytics.com/modes/track/#tracker-selection
