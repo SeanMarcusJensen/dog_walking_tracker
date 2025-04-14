@@ -10,4 +10,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
+ENV DJANGO_SUPERUSER_USERNAME=jensen
+ENV DJANGO_SUPERUSER_EMAIL=seanmarcusj@gmail.com
+ENV DJANGO_SUPERUSER_PASSWORD=cw41
+
+RUN python manage.py createsuperuser --noinput || true
+
 CMD ["gunicorn", "webapp.wsgi:application", "--bind", "0.0.0.0:8000"]

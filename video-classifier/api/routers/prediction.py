@@ -1,10 +1,6 @@
-from typing import Union
-
 from fastapi import APIRouter
 from fastapi import File, UploadFile
 from fastapi.responses import HTMLResponse, RedirectResponse
-from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel, Field
 
 from ultralytics import YOLO
 import numpy as np

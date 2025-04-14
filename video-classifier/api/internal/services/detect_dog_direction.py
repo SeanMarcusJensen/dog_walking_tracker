@@ -3,7 +3,8 @@ import numpy as np
 from ultralytics import YOLO
 
 # Load YOLO model
-model = YOLO("yolov8n.pt")  # or custom-trained model
+model = YOLO("yolo11n.pt")
+
 
 def detect_dog_direction(video_path):
     cap = cv2.VideoCapture(video_path)
@@ -26,7 +27,7 @@ def detect_dog_direction(video_path):
             cls = int(r.cls[0])
             label = model.names[cls]
             x1, y1, x2, y2 = map(int, r.xyxy[0])
-            
+
             if label == "dog":
                 dog_boxes.append((x1, y1, x2, y2))
             elif label == "door":  # Custom class — may not exist in default model
