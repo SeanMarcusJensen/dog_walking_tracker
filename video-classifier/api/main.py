@@ -3,6 +3,8 @@ from typing import Union
 from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
+from pydantic import BaseModel, Field
+
 
 from ultralytics import YOLO
 import numpy as np
@@ -18,9 +20,16 @@ app.mount('/static', StaticFiles(directory="static"), name="static")
 
 model = YOLO("yolo11n.pt")
 
+
 def predict(img):
-    results = model.predict(source=img, save=True, save_txt=True, save_conf=True)
+    results = model.predict(source=img, save=True,
+                            save_txt=True, save_conf=True)
     return results
+
+
+class QueueItem(BaseModel):
+    url: str = Field(..., description="URL of the video to be processed")
+
 
 @app.get("/")
 async def main():
@@ -76,6 +85,35 @@ async def create_upload_file(file: UploadFile = File(...)):
     except Exception as e:
         return HTMLResponse(content=f"<h1>Error:</h1><p>{str(e)}</p>")
 
+
+@app.post("/predict/")
+async def predict_endpoint(file: UploadFile = File(...)):
+    try:
+        # Read image
+        contents = await file.read()
+        npimg = np.frombuffer(contents, np.uint8)
+        img = cv2.imdecode(npimg, cv2.IMREAD_COLOR)
+
+        # Run YOLO prediction
+        results = model.predict(img)
+
+        # Plot results (draw boxes)
+        results[0].plot()  # This draws directly on the image array
+        drawn_img = results[0].plot()  # Optional: if you want to assign it
+
+        # Convert BGR to RGB for browser
+        img_rgb = cv2.cvtColor(drawn_img, cv2.COLOR_BGR2RGB)
+
+        # Encode image to base64
+        _, buffer = cv2.imencode('.jpg', img_rgb)
+        img_base64 = base64.b64encode(buffer).decode('utf-8')
+
+        return {"image": img_base64}
+
+    except Exception as e:
+        return HTMLResponse(content=f"<h1>Error:</h1><p>{str(e)}</p>")
+
+
 @app.get("/items/{item_id}")
 def read_item(item_id: int, q: Union[str, None] = None):
     return {"item_id": item_id, "q": q}
@@ -119,6 +157,7 @@ async def upload_video(file: UploadFile = File(...)):
         return RedirectResponse(url=f"/video/{output_path.split('/')[-1]}")
     except Exception as e:
         return HTMLResponse(content=f"<h1>Error:</h1><p>{str(e)}</p>")
+
 
 @app.get("/video/{video_path:path}")
 async def get_video(video_path: str):
