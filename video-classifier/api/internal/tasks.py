@@ -51,4 +51,4 @@ def infere_video(tmp_file) -> list:
     # delete temp
     os.remove(tmp_file)
 
-    return infer_time, [status]
+    return infer_time, [status, 'pee']
