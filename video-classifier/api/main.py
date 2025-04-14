@@ -1,4 +1,4 @@
-from .internal.tasks import classify_video_task
+from internal.tasks import classify_video_task
 from pydantic import BaseModel, Field
 from fastapi import APIRouter, BackgroundTasks
 from typing import Union

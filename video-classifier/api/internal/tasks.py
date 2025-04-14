@@ -42,7 +42,7 @@ def infere_video(tmp_file) -> list:
     start_time = time.time()
 
     # handle the video data with your model
-    status = detect_dog_direction(tmp_file, debug=True)
+    status = detect_dog_direction(tmp_file, debug=False)
 
     end_time = time.time()
     infer_time = end_time - start_time
