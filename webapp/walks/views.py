@@ -50,6 +50,10 @@ def stop_walk(request, id):
     walk = Walk.objects.get(id=id)
     if not walk:
         return JsonResponse({"message": "Walk not found."}, status=404)
+    if walk.status == "completed":
+        return redirect("walks:index")
+    if walk.status == "cancelled":
+        return redirect("walks:index")
     walk.status = "completed"
     walk.end_time = now()
     walk.save()
