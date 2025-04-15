@@ -62,3 +62,25 @@ def delete_walk(request, id):
         return JsonResponse({"message": "Walk not found."}, status=404)
     walk.delete()
     return redirect("walks:index")
+
+
+def add_event(request, id):
+    walk = Walk.objects.get(id=id)
+    if not walk:
+        return JsonResponse({"message": "Walk not found."}, status=404)
+    event_type = request.POST.get("event_type")
+    event = WalkEvent.objects.create(walk=walk, event_type=event_type)
+    return redirect("walks:details", id=walk.id)
+
+
+def delete_event(request, id, eid):
+    walk = Walk.objects.get(id=id)
+    if not walk:
+        return JsonResponse({"message": "Walk not found."}, status=404)
+    event = walk.events.get(id=eid)
+    if not event:
+        return JsonResponse({"message": "Event not found."}, status=404)
+
+    walk_id = walk.id
+    event.delete()
+    return redirect("walks:details", id=walk_id)

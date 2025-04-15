@@ -10,6 +10,7 @@
             <tr>
             <th scope="col">#</th>
             <th scope="col">Event</th>
+            <th scope="col">Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -17,6 +18,8 @@
             <tr>
                 <th scope="row">{{event.id}}</th>
                 <td>{{event.event_type}}</td>
+                <td>
+                    <a href="{$ url 'walks.delete_event' id=id eid=event.id %}" class="btn btn-danger">Delete</a>
             </tr>
             {% endfor %}
         </tbody>
