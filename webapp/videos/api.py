@@ -25,18 +25,6 @@ class VideoUploadView(APIView):
     authentication_classes = [authentication.SessionAuthentication]
     # permission_classes = [permissions.IsAuthenticated]
 
-    def get(self, request, id: str, *args, **kwargs):
-        if not id:
-            return Response({"message": "ID is required."}, status=status.HTTP_400_BAD_REQUEST)
-
-        video = Video.objects.get(id=id)
-        if not video:
-            return Response({"message": "Video not found."}, status=status.HTTP_404_NOT_FOUND)
-
-        extension = video.extension.lower()
-        mime_type = f"video/{extension}" if extension != 'mov' else 'video/quicktime'
-        return FileResponse(video.file.open('rb'), content_type=mime_type)
-
     def post(self, request, *args, **kwargs):
         serializer = VideoUploadSerializer(data=request.data)
 
@@ -53,6 +41,24 @@ class VideoUploadView(APIView):
 
         return Response(
             {"message": "Video received.", "url": video.id, "task": task}, status=status.HTTP_201_CREATED)
+
+    def get(self, request, id: str, *args, **kwargs):
+        if not id:
+            return Response({"message": "ID is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        video = Video.objects.get(id=id)
+        if not video:
+            return Response({"message": "Video not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        extension = video.extension.lower()
+        mime_type = f"video/{extension}" if extension != 'mov' else 'video/quicktime'
+        return FileResponse(video.file.open('rb'), content_type=mime_type)
+
+    def patch(self, request, id: str, *args, **kwargs):
+        return Response({"message": "PATCH method not allowed yet."}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def put(self, request, id: str, *args, **kwargs):
+        return Response({"message": "PUT method not allowed yet."}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
     def delete(self, request, id: str, *args, **kwargs):
         if not id:
