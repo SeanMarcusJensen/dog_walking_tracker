@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Walks{% endblock %}
+
+{% block content %}
+<div class='container'>
+    <h1 class='text-primary text-center'>Walks</h1>
+    <table class="table">
+        <thead>
+            <tr>
+            <th scope="col">#</th>
+            <th scope="col">Started At</th>
+            <th scope="col">Status</th>
+            <th scope="col">Duration</th>
+            <th scope="col">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for walk in walks %}
+            <tr>
+                <th scope="row">{{walk.id}}</th>
+                <td>{{walk.start_time}}</td>
+                <td>{{walk.status}}</td>
+                <td>{{walk.duration}}</td>
+                <td>
+                    <div class='d-flex justify-content-between'>
+                        <form method="POST" action="{% url 'walks:stop' walk.id %}">
+                            {% csrf_token %}
+                            <button class='btn btn-primary'>Stop</button>
+                        </form>
+                        <form method="POST" action="{% url 'walks:delete' walk.id %}">
+                            {% csrf_token %}
+                            <button class='btn btn-danger'>Delete</button>
+                        </form>
+                        <form method="GET" action="{% url 'walks:details' walk.id %}">
+                            {% csrf_token %}
+                            <button class='btn btn-primary'>Details</button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -22,6 +22,8 @@ class Walk(models.Model):
         """
         Calculate the duration of the walk.
         """
+        if not self.end_time:
+            return 0
         return self.end_time - self.start_time
 
     def add_event(self, event_type):

@@ -8,11 +8,16 @@
     
     <div class="collapse navbar-collapse" id="mainNavbar">
         <ul class="navbar-nav ms-auto">
-            {% comment %} <li class="nav-item">
-                <a class="nav-link {% if request.resolver_match.app_name == 'chat' %}active-tab{% endif %}" href="{% url 'chat:index' %}">
-                    Chat
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.app_name == 'dashboard' %}active-tab{% endif %}" href="{% url 'dashboard:index' %}">
+                  Dashboard
                 </a>
-            </li> {% endcomment %}
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.app_name == 'walks' %}active-tab{% endif %}" href="{% url 'walks:index' %}">
+                  Walks
+                </a>
+            </li>
         </ul>
     </div>
 
