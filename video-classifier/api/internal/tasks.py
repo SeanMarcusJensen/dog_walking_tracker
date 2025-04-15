@@ -8,6 +8,7 @@ import time
 def classify_video_task(video_id: str, video_url: str, callback_url: str):
     try:
         file_path = f"/tmp/video_{video_id}.mp4"
+        print(f"Downloading video from {video_url} to {file_path}")
 
         with requests.get(video_url, stream=True) as r:
             r.raise_for_status()

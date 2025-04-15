@@ -40,7 +40,7 @@ class VideoUploadView(APIView):
         try:
             task = notify(
                 video.id,
-                request.build_absolute_uri(str(video.id)),
+                video_url=f"{settings.VIDEO_BASE_URL}{request.path}{video.id}",
                 callback=settings.CALLBACK_BASE_URL)
         except requests.RequestException as e:
             print("Error notifying callback URL:", e)
