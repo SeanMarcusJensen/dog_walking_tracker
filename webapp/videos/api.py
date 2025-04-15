@@ -4,8 +4,21 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import authentication, permissions
 from .serializers import VideoUploadSerializer
+from django.conf import settings
+import requests
 
 from .models import Video
+
+
+def notify(video_id, video_url, callback):
+    data = {
+        "video_id": str(video_id),
+        "video_url": video_url,
+        "callback_url": callback
+    }
+
+    response = requests.post(settings.NOTIFY_URL, json=data)
+    return response.json()
 
 
 class VideoUploadView(APIView):
@@ -33,10 +46,13 @@ class VideoUploadView(APIView):
         video_file = serializer.validated_data['video']
         video = Video.create_from_file(video_file)
 
-        # TODO: Notify on topic for video upload or let AI use polling or so.
+        task = notify(
+            video.id,
+            request.build_absolute_uri(str(video.id)),
+            callback=settings.CALLBACK_BASE_URL)
 
         return Response(
-            {"message": "Video received.", "url": video.id}, status=status.HTTP_201_CREATED)
+            {"message": "Video received.", "url": video.id, "task": task}, status=status.HTTP_201_CREATED)
 
     def delete(self, request, id: str, *args, **kwargs):
         if not id:

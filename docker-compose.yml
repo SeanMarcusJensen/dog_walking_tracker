@@ -1,4 +1,4 @@
-version: "3.9"
+version: "3.11"
 
 services:
   web:
@@ -10,6 +10,8 @@ services:
       - ./webapp:/code
     ports:
       - "8080:8000"
+    env_file:
+      - ./webapp/.env
 
   api:
     build:

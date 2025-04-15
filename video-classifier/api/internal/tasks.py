@@ -8,9 +8,8 @@ import time
 def classify_video_task(video_id: str, video_url: str, callback_url: str):
     try:
         file_path = f"/tmp/video_{video_id}.mp4"
-        get_url = f"{video_url}/{video_id}"
 
-        with requests.get(get_url, stream=True) as r:
+        with requests.get(video_url, stream=True) as r:
             r.raise_for_status()
             with open(file_path, "wb") as f:
                 for chunk in r.iter_content(chunk_size=8192):

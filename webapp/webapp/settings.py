@@ -13,6 +13,14 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 import os
 from pathlib import Path
 
+from decouple import config
+
+# fallback for local dev
+NOTIFY_URL = config("NOTIFY_URL", default="http://localhost:8001")
+CALLBACK_BASE_URL = config(
+    "CALLBACK_BASE_URL", default="http://localhost:8000")
+
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
