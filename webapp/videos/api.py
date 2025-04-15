@@ -41,7 +41,7 @@ class VideoUploadView(APIView):
             task = notify(
                 video.id,
                 video_url=f"{settings.VIDEO_BASE_URL}{request.path}{video.id}",
-                callback=settings.CALLBACK_BASE_URL)
+                callback=f"{settings.CALLBACK_BASE_URL}{request.path}{video.id}")
         except requests.RequestException as e:
             print("Error notifying callback URL:", e)
             return Response({"message": "Failed to notify callback URL."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
