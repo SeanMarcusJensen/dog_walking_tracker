@@ -10,11 +10,23 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+from decouple import config, Csv
 import os
 from pathlib import Path
 
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+
+# Check which environment we are running in
+# Default to local if DJANGO_ENV is not set
+
+NOTIFY_URL = config("NOTIFY_URL", default="http://defaulted_url:8000")
+CALLBACK_BASE_URL = config(
+    "CALLBACK_BASE_URL", default="http://defaulted_callback:8000")
+VIDEO_BASE_URL = config(
+    "VIDEO_BASE_URL", default="http://defauled_video_base_url:8000")
 
 
 # Quick-start development settings - unsuitable for production
@@ -26,8 +38,7 @@ SECRET_KEY = 'django-insecure-++plfi%k$xr+1#+knjg4*-uygd19&ott)s*uy=^!srs@&h6i1+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='*', cast=Csv())
 
 # Application definition
 
@@ -144,3 +155,6 @@ REST_FRAMEWORK = {
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
+
+STATIC_URL = '/static/'  # already present, usually
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # 🔥 this is the fix

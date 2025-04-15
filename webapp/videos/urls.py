@@ -20,7 +20,6 @@ from . import api
 app_name = 'videos'
 
 urlpatterns = [
-    path('upload/', api.VideoUploadView.as_view(), name='upload'),
-    path('<int:id>/', api.VideoUploadView.as_view(), name='get_by_id'),
-    path('<int:id>/delete/', api.VideoUploadView.as_view(), name='delete_by_id'),
+    path('', api.VideoUploadView.as_view(), name='upload-video'),
+    path('<int:id>/', api.VideoUploadView.as_view(), name='video'),
 ]
