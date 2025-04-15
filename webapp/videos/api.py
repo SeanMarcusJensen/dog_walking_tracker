@@ -16,8 +16,11 @@ def notify(video_id, video_url, callback):
         "video_url": video_url,
         "callback_url": callback
     }
+    print(f"Nofitying Data: {data}")
 
     response = requests.post(settings.NOTIFY_URL, json=data)
+    if response.raise_for_status():
+        raise Exception("Failed to notify callback URL")
     return response.json()
 
 
@@ -34,10 +37,14 @@ class VideoUploadView(APIView):
         video_file = serializer.validated_data['video']
         video = Video.create_from_file(video_file)
 
-        task = notify(
-            video.id,
-            request.build_absolute_uri(str(video.id)),
-            callback=settings.CALLBACK_BASE_URL)
+        try:
+            task = notify(
+                video.id,
+                request.build_absolute_uri(str(video.id)),
+                callback=settings.CALLBACK_BASE_URL)
+        except requests.RequestException as e:
+            print("Error notifying callback URL:", e)
+            return Response({"message": "Failed to notify callback URL."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response(
             {"message": "Video received.", "url": video.id, "task": task}, status=status.HTTP_201_CREATED)

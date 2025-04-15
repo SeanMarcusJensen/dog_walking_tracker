@@ -10,6 +10,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
+# Rename the env file explicitly for python-decouple to pick up
+RUN cp .env.docker .env
+
 ENV DJANGO_SUPERUSER_USERNAME=jensen
 ENV DJANGO_SUPERUSER_EMAIL=seanmarcusj@gmail.com
 ENV DJANGO_SUPERUSER_PASSWORD=cw41
