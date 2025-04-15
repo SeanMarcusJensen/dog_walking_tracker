@@ -12,6 +12,11 @@ class Video(models.Model):
     id = models.AutoField(primary_key=True)
     file = models.FileField(
         upload_to='uploads/', storage=default_storage)
+    status = models.CharField(max_length=20, default='pending', choices=[
+        ('pending', 'Pending'),
+        ('completed', 'Completed'),
+        ('failed', 'Failed'),
+    ])
     video_size = models.BigIntegerField()
     extension = models.CharField(max_length=10, default='mp4')
     created_at = models.DateTimeField(auto_now_add=True)
@@ -31,6 +36,7 @@ class Video(models.Model):
             file=video_file,
             video_size=video_file.size,
             extension=extension,
+            status='pending',
         )
 
         video.save()

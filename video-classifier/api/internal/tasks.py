@@ -16,14 +16,15 @@ def classify_video_task(video_id: str, video_url: str, callback_url: str):
                 for chunk in r.iter_content(chunk_size=8192):
                     f.write(chunk)
 
-        inference_duration, response = infere_video(file_path)
+        inference_duration, direction, events = infere_video(file_path)
 
         requests.patch(callback_url, json={
             "success": True,
             "video_id": video_id,
             "message": 'Video classification completed',
             "duration": inference_duration,
-            "predictions": response})
+            "prediction": direction,
+            "events": events})
 
     except Exception as e:
         logging.error(f"Error in classify_video_task: {e}")
@@ -31,7 +32,8 @@ def classify_video_task(video_id: str, video_url: str, callback_url: str):
             "success": False,
             "video_id": video_id,
             "message": str(e),
-            "predictions": []})
+            "prediction": "unknown",
+            "events": []})
 
 
 def infere_video(tmp_file) -> list:
@@ -51,4 +53,4 @@ def infere_video(tmp_file) -> list:
     # delete temp
     os.remove(tmp_file)
 
-    return infer_time, [status, 'pee']
+    return infer_time, status, []

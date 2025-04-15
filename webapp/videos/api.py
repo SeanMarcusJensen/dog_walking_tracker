@@ -6,6 +6,8 @@ from rest_framework import authentication, permissions
 from .serializers import VideoUploadSerializer
 from django.conf import settings
 import requests
+from walks.models import Walk
+from django.utils.timezone import now
 
 from .models import Video
 
@@ -41,7 +43,7 @@ class VideoUploadView(APIView):
             task = notify(
                 video.id,
                 video_url=f"{settings.VIDEO_BASE_URL}{request.path}{video.id}",
-                callback=f"{settings.CALLBACK_BASE_URL}{request.path}{video.id}")
+                callback=f"{settings.CALLBACK_BASE_URL}{request.path}{video.id}/")
         except requests.RequestException as e:
             print("Error notifying callback URL:", e)
             return Response({"message": "Failed to notify callback URL."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -62,7 +64,46 @@ class VideoUploadView(APIView):
         return FileResponse(video.file.open('rb'), content_type=mime_type)
 
     def patch(self, request, id: str, *args, **kwargs):
-        return Response({"message": "PATCH method not allowed yet."}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        try:
+            video = Video.objects.get(id=id)
+        except Video.DoesNotExist:
+            return Response({"message": "Video not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        if not video:
+            return Response({"message": "Video not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        if request.data.get('success'):
+            video.status = 'completed'
+        else:
+            video.status = 'failed'
+        video.save()
+
+        prediction = request.data.get('prediction')
+        if prediction == "out":
+            # Start a new walk
+            walk = Walk.objects.create(
+                start_time=now(),
+                status="started"
+            )
+            for event in request.data.get('events', []):
+                walk.add_event(event_type=event)
+            walk.save()
+
+            return Response({"status": "walk started"})
+
+        elif prediction == "in":
+            # Complete the most recent open walk
+            walk = Walk.objects.filter(
+                status="started").order_by("-start_time").first()
+            if not walk:
+                return Response({"error": "No active walk to complete"}, status=400)
+
+            walk.end_time = now()
+            walk.status = "completed"
+            walk.save()
+            return Response({"status": "walk finished"})
+
+        return Response({"error": "Unknown prediction"}, status=400)
 
     def put(self, request, id: str, *args, **kwargs):
         return Response({"message": "PUT method not allowed yet."}, status=status.HTTP_405_METHOD_NOT_ALLOWED)

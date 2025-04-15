@@ -7,17 +7,32 @@ class Walk(models.Model):
     """
     Model representing a walk.
     """
-    id = models.AutoField(primary_key=True)
     # user = models.ForeignKey(
     #     'auth.User', related_name='walks', on_delete=models.CASCADE)
+    id = models.AutoField(primary_key=True)
+    status = models.CharField(max_length=20, default='started', choices=[
+        ('started', 'Started'),
+        ('completed', 'Completed'),
+        ('cancelled', 'Cancelled'),
+    ])
     start_time = models.DateTimeField()
-    end_time = models.DateTimeField()
+    end_time = models.DateTimeField(null=True, blank=True)
 
     def get_duration(self):
         """
         Calculate the duration of the walk.
         """
         return self.end_time - self.start_time
+
+    def add_event(self, event_type):
+        """
+        Add an event to the walk.
+        """
+        event = WalkEvent.objects.create(
+            walk=self,
+            event_type=event_type,
+        )
+        return event
 
     def __str__(self):
         return self.start_time.strftime("%Y-%m-%d %H:%M:%S")
