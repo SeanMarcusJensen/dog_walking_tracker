@@ -40,6 +40,9 @@ def detect_dog_direction(video_path, debug=False):
             elif label == "person":
                 cropped = frame[y1:y2, x1:x2]
                 event = detect_hand_gesture(cropped)
+                if event is None:
+                    continue
+                print(f"Detected event: {event}")
                 if event == "B":
                     events.append("poo")
                 elif event == "T":

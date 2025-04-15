@@ -4,13 +4,11 @@ model = YOLO("yolo11n.pt")  # Load a pretrained YOLOv8 model
 
 results = model.train(
     data="./datasets/data.yaml",  # Path to the dataset configuration file
-    freeze=10,
-    epochs=10,  # Number of training epochs
+    epochs=20,  # Number of training epochs
     batch=16,  # Batch size
     imgsz=640,  # Input image size
     device=0,  # Device to train on (0 for GPU, 'cpu' for CPU)
     pretrained=True,  # Use pretrained weights
-    resume=False,
     project="runs/train",  # Directory to save training results
     name="hand_gesture",  # Name of the training run
     exist_ok=True,  # Overwrite existing results
