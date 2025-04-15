@@ -2,6 +2,7 @@ import requests
 import logging
 import os
 from .services.detect_dog_direction import detect_dog_direction
+from .services.hand_gesture_detection import detect_hand_gesture
 import time
 
 
@@ -40,11 +41,12 @@ def infere_video(tmp_file) -> list:
     # Mock example
     # Then load the file for your model
     logging.info("Running YOLOv11 model on video data")
+    events = []
 
     start_time = time.time()
 
     # handle the video data with your model
-    status = detect_dog_direction(tmp_file, debug=False)
+    status, events = detect_dog_direction(tmp_file, debug=False)
 
     end_time = time.time()
     infer_time = end_time - start_time
@@ -53,4 +55,4 @@ def infere_video(tmp_file) -> list:
     # delete temp
     os.remove(tmp_file)
 
-    return infer_time, status, []
+    return infer_time, status, events

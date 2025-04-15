@@ -2,6 +2,7 @@ from multiprocessing.util import Finalize
 import cv2
 import numpy as np
 from ultralytics import YOLO
+from .hand_gesture_detection import detect_hand_gesture
 
 # Load YOLO model
 model = YOLO("yolo11n.pt")
@@ -15,6 +16,7 @@ def detect_dog_direction(video_path, debug=False):
     # Define door threshold (center line)
     door_line_y = frame_height // 2 + 100
     previous_positions = []
+    events = []
 
     while True:
         ret, frame = cap.read()
@@ -24,6 +26,7 @@ def detect_dog_direction(video_path, debug=False):
         results = model(frame)[0]
         dog_boxes = []
         door_boxes = []
+        events = []
 
         for r in results.boxes:
             cls = int(r.cls[0])
@@ -34,6 +37,13 @@ def detect_dog_direction(video_path, debug=False):
                 dog_boxes.append((x1, y1, x2, y2))
             elif label == "door":  # Custom class — may not exist in default model
                 door_boxes.append((x1, y1, x2, y2))
+            elif label == "person":
+                cropped = frame[y1:y2, x1:x2]
+                event = detect_hand_gesture(cropped)
+                if event == "B":
+                    events.append("poo")
+                elif event == "T":
+                    events.append("pee")
 
         if dog_boxes:
             # Track centroid of the first dog box
@@ -56,14 +66,14 @@ def detect_dog_direction(video_path, debug=False):
 
     # Decide movement direction
     if len(previous_positions) < 2:
-        return "unknown"
+        return "unknown", []
 
     start = previous_positions[0]
     end = previous_positions[-1]
 
     if start < door_line_y and end > door_line_y:
-        return "in"
+        return "in", events
     elif start > door_line_y and end < door_line_y:
-        return "out"
+        return "out", []
     else:
-        return "unknown"
+        return "unknown", []

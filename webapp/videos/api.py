@@ -51,11 +51,12 @@ class VideoUploadView(APIView):
         return Response(
             {"message": "Video received.", "url": video.id, "task": task}, status=status.HTTP_201_CREATED)
 
-    def get(self, request, id: str, *args, **kwargs):
+    def get(self, request, id: int, *args, **kwargs):
         if not id:
+            print("ID is None")
             return Response({"message": "ID is required."}, status=status.HTTP_400_BAD_REQUEST)
 
-        video = Video.objects.get(id=id)
+        video = Video.objects.get(id=str(id))
         if not video:
             return Response({"message": "Video not found."}, status=status.HTTP_404_NOT_FOUND)
 
@@ -63,11 +64,13 @@ class VideoUploadView(APIView):
         mime_type = f"video/{extension}" if extension != 'mov' else 'video/quicktime'
         return FileResponse(video.file.open('rb'), content_type=mime_type)
 
-    def patch(self, request, id: str, *args, **kwargs):
+    def patch(self, request, id: int, *args, **kwargs):
         try:
-            video = Video.objects.get(id=id)
+            video = Video.objects.get(id=str(id))
         except Video.DoesNotExist:
             return Response({"message": "Video not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        print("Received PATCH request with data:", request.data)
 
         if not video:
             return Response({"message": "Video not found."}, status=status.HTTP_404_NOT_FOUND)
@@ -79,6 +82,11 @@ class VideoUploadView(APIView):
         video.save()
 
         prediction = request.data.get('prediction')
+        if prediction == "unknown":
+            # No action needed
+            print("Prediction is unknown, no action taken.")
+            return Response({"status": "no action taken"}, status=status.HTTP_404_NOT_FOUND)
+
         if prediction == "out":
             # Start a new walk
             walk = Walk.objects.create(

@@ -1,3 +1,5 @@
+runs/
+datasets/
 media/
 test_env/
 staticfiles/

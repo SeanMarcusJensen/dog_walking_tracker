@@ -29,3 +29,4 @@ Read more about them in the respected component folder.
 
 Could have used one api. But I wanted to have the inverse, because inference on the video is blocking for the video length. Thus Queue system.
 
+FineTuning of YOLO -> Had to use two models.
