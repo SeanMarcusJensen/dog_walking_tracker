@@ -43,6 +43,8 @@ def detect_hand_gesture(frame):
             return "poo"
         elif fingers_up == 3:
             return "both"
+        elif fingers_up == 4:
+            return "other"
         elif fingers_up == 5:
             return "play"
 

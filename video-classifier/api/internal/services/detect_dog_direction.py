@@ -1,6 +1,4 @@
-from multiprocessing.util import Finalize
 import cv2
-import numpy as np
 from ultralytics import YOLO
 from .hand_gesture_detection import detect_hand_gesture
 

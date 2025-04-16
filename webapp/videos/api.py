@@ -86,25 +86,24 @@ class VideoUploadView(APIView):
             # No action needed
             print("Prediction is unknown, no action taken.")
             return Response({"status": "no action taken"}, status=status.HTTP_404_NOT_FOUND)
-
-        if prediction == "out":
+        elif prediction == "out":
             # Start a new walk
             walk = Walk.objects.create(
                 start_time=now(),
                 status="started"
             )
-            for event in request.data.get('events', []):
-                walk.add_event(event_type=event)
-            walk.save()
 
             return Response({"status": "walk started"})
-
         elif prediction == "in":
             # Complete the most recent open walk
             walk = Walk.objects.filter(
                 status="started").order_by("-start_time").first()
+
             if not walk:
                 return Response({"error": "No active walk to complete"}, status=400)
+
+            for event in request.data.get('events', []):
+                walk.add_event(event_type=event)
 
             walk.end_time = now()
             walk.status = "completed"

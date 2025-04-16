@@ -49,8 +49,8 @@ class WalkEvent(models.Model):
     event_type = models.CharField(max_length=50, choices=[
         ('pee', 'Pee'),
         ('poo', 'Poo'),
-        ('diarrhea', 'Diarrhea'),
-        ('vomit', 'Vomit'),
+        ('both', 'Both'),
+        ('play', 'Play'),
         ('other', 'Other'),
     ])
 

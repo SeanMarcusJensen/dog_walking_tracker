@@ -7,3 +7,4 @@ node_modules/
 .vscode/
 media/
 uploads/
+test_env/

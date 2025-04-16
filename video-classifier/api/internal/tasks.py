@@ -20,13 +20,18 @@ def classify_video_task(video_id: str, video_url: str, callback_url: str):
         inference_duration, direction, events = infere_video(file_path)
 
         """ We can calculate the weight of the events here.
-        If the event has occurred more than 5 times, we can consider it as a significant event.
-        If the event has occurred less than 5 times, we can consider it as a minor event or noise.
+        If the event has occurred more than 3 times, we can consider it as a significant event.
+        If the event has occurred less than 3 times, we can consider it as a minor event or noise.
         """
         significant_events = []
         for event, count in events.items():
-            if count > 5:
-                significant_events.append(event)
+            print(f"Event: {event}, Count: {count}")
+            significant_events.append(event)
+            # if count > 3:
+            # do not want duplicate events.
+
+        print(
+            f"Sending significant events: {significant_events} to {callback_url}")
 
         requests.patch(callback_url, json={
             "success": True,
@@ -46,7 +51,7 @@ def classify_video_task(video_id: str, video_url: str, callback_url: str):
             "events": []})
 
 
-def infere_video(tmp_file) -> list:
+def infere_video(tmp_file):
     # Mock example
     # Then load the file for your model
     logging.info("Running YOLOv11 model on video data")
