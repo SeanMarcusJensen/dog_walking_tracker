@@ -19,13 +19,22 @@ def classify_video_task(video_id: str, video_url: str, callback_url: str):
 
         inference_duration, direction, events = infere_video(file_path)
 
+        """ We can calculate the weight of the events here.
+        If the event has occurred more than 5 times, we can consider it as a significant event.
+        If the event has occurred less than 5 times, we can consider it as a minor event or noise.
+        """
+        significant_events = []
+        for event, count in events.items():
+            if count > 5:
+                significant_events.append(event)
+
         requests.patch(callback_url, json={
             "success": True,
             "video_id": video_id,
             "message": 'Video classification completed',
             "duration": inference_duration,
             "prediction": direction,
-            "events": events})
+            "events": significant_events})
 
     except Exception as e:
         logging.error(f"Error in classify_video_task: {e}")

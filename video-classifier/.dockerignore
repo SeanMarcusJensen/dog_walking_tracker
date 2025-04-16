@@ -1,2 +1,5 @@
-api/datasets/*
-api/runs/*
+# Ignore dev junk
+__pycache__/
+*.pyc
+*.pyo
+*.log

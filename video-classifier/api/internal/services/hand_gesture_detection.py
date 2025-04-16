@@ -45,6 +45,5 @@ def detect_hand_gesture(frame):
             return "both"
         elif fingers_up == 5:
             return "play"
-        else:
-            return None
+
     return None

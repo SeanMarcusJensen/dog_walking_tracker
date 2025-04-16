@@ -1,0 +1,9 @@
+# Ignore dev junk
+__pycache__/
+*.pyc
+*.pyo
+*.log
+node_modules/
+.vscode/
+media/
+uploads/

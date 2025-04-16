@@ -4,11 +4,33 @@ import mediapipe as mp
 mp_hands = mp.solutions.hands
 mp_drawing = mp.solutions.drawing_utils
 hands_model = mp_hands.Hands(
-    static_image_mode=False, max_num_hands=1, min_detection_confidence=0.7)
+    static_image_mode=False, max_num_hands=1, min_detection_confidence=0.75)
+
+
+def detect_gesture_shown_to_camera(frame):
+    """ Determines is the fingers are above the palm. If so, returns the gesture.
+    Args:
+        frame: The frame from the camera.
+    Returns:
+        str: The gesture shown by the hand.
+    """
+
+    frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    results = hands_model.process(frame_rgb)
+
+    if results.multi_hand_landmarks:
+        for hand_landmarks in results.multi_hand_landmarks:
+            mp_drawing.draw_landmarks(
+                frame, hand_landmarks, mp_hands.HAND_CONNECTIONS)
+            fingers_up = count_fingers_up(hand_landmarks.landmark)
+            gesture_text = gesture_from_fingers(fingers_up)
+            return gesture_text
+
+    return "No hand"
 
 
 def count_fingers_up(landmarks):
-    finger_tips_ids = [8, 12, 16, 20]
+    finger_tips_ids = [4, 8, 12, 16, 20]
     fingers = []
 
     # Thumb
@@ -38,7 +60,7 @@ def gesture_from_fingers(fingers_up):
         return f"{fingers_up} fingers"
 
 
-cap = cv2.VideoCapture(0)  # Use webcam
+cap = cv2.VideoCapture('/home/jensen/Documents/dog_walk_in.mp4')  # Use webcam
 
 while cap.isOpened():
     ret, frame = cap.read()
