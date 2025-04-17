@@ -72,7 +72,7 @@ class VideoUploadView(APIView):
         return Response(
             {"message": "Video received.", "url": video.id, "task": task}, status=status.HTTP_201_CREATED)
 
-    def get(self, request, id: int, *args, **kwargs):
+    def get(self, request, device_id: int, id: int, *args, **kwargs):
         if not id:
             print("ID is None")
             return Response({"message": "ID is required."}, status=status.HTTP_400_BAD_REQUEST)
@@ -85,7 +85,7 @@ class VideoUploadView(APIView):
         mime_type = f"video/{extension}" if extension != 'mov' else 'video/quicktime'
         return FileResponse(video.file.open('rb'), content_type=mime_type)
 
-    def patch(self, request, id: int, *args, **kwargs):
+    def patch(self, request, device_id: int, id: int, *args, **kwargs):
         try:
             video = Video.objects.get(id=str(id))
         except Video.DoesNotExist:
@@ -134,10 +134,10 @@ class VideoUploadView(APIView):
 
         return Response({"error": "Unknown prediction"}, status=400)
 
-    def put(self, request, id: str, *args, **kwargs):
+    def put(self, request, device_id: int, id: str, *args, **kwargs):
         return Response({"message": "PUT method not allowed yet."}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
-    def delete(self, request, id: str, *args, **kwargs):
+    def delete(self, request, device_id: int, id: str, *args, **kwargs):
         if not id:
             return Response({"message": "ID is required."}, status=status.HTTP_400_BAD_REQUEST)
 
