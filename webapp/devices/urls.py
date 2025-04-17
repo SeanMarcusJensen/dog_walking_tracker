@@ -25,4 +25,5 @@ urlpatterns = [
     path('export/', views.export, name='export'),
     path('import/', views.import_data, name='import'),
     path('details/<int:device_id>/', views.device_details, name='details'),
+    path('register_frame/', views.register_frame, name='register_frame'),
 ]

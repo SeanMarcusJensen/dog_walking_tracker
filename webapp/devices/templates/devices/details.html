@@ -1,13 +1,15 @@
 {% extends 'base.html' %}
-{% block title %} {{device.name}} {% endblock %}
+{% block title %} {{ device.name }} {% endblock %}
 {% block content %}
-<div class="container d-flex flex-row flex-wrap justify-content-between">
+<div class="container d-flex flex-row flex-wrap justify-content-between pt-5">
     <div>
+        <a href="{% url 'devices:index' %}" class="btn btn-secondary">Back to Devices</a>
+        <br/>
         <h1>{{ device.name }}</h1>
         <p><strong>Device Type:</strong> {{ device.type }}</p>
         <p><strong>Device Location:</strong> {{ device.location }}</p>
         <p><strong>IP Address:</strong> {{ device.ip }}</p>
-        <p><strong>Status:</strong> {% if device.status %} Active {% else %} Inactivce {% endif %}</p>
+        <p><strong>Status:</strong> {% if device.status %} Active {% else %} Inactive {% endif %}</p>
 
         <h2>Walks</h2>
         <ul>
@@ -17,65 +19,148 @@
                 <li>No walks recorded.</li>
             {% endfor %}
         </ul>
-
-        <a href="{% url 'devices:index' %}" class="btn btn-secondary">Back to Devices</a>
     </div>
 
-    <div class='d-flex flex-column align-items-center'>
-        <h3 class='text-secondary'>Live Stream</h3>
-        <img src="{{ device.stream_url }}" width="640" height="480" />
-        <div>
-            <button class="btn btn-primary" id="start_stream_button">Start Stream</button>
-            <button class="btn btn-danger" id="stop_stream_button">Stop Stream</button>
-        </div>
+    <div class="d-flex flex-column align-items-center">
+        <h3 class="text-secondary">Live Stream</h3>
         <div class="mt-2">
-            <p><strong>Stream URL:</strong> {{ device.stream_url }}</p>
+            <a href="{{ device.stream_url }}"><strong>Stream URL:</strong> {{ device.stream_url }}</a>
+        </div>
+        <div id="stream-container">
+            <img id="stream" width="640" height="480" />
+            <canvas id="canvas" width="640" height="480"></canvas>
+        </div>
+        <div class="mt-4">
+            <button id="registerFrame" class="btn btn-primary mt-2">Register Frame</button>
+            <button id="clear" class="btn btn-danger mt-2">Clear Canvas</button>
         </div>
     </div>
-
 </div>
 
 <script>
-    STOP_STREAM_URL = {{ device.stop_stream_url }}
-    START_STREAM_URL = {{ device.start_stream_url }}
+    const canvas = document.getElementById('canvas');
+    const clearBtn = document.getElementById('clear');
+    const registerFrameBtn = document.getElementById('registerFrame');
+    const ctx = canvas.getContext('2d');
+    const stream = document.getElementById('stream');
+    const webSocket = new WebSocket('{{ device.websocket_url }}');
 
-    document.getElementById('start_stream_button').onclick = function() {
-        if (confirm('Are you sure you want to start the stream?')) {
-            fetch(START_STREAM_URL, { method: 'POST' })
-                .then(response => {
-                    if (response.ok) {
-                        alert('Stream started successfully!');
-                    } else {
-                        alert('Failed to start the stream.');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('An error occurred while starting the stream.');
-                })
-                .finally(() => {
-                    // Reload the page to refresh the stream
-                    window.location.reload();
-                });
-        }
+    let frozen = false;
+    let currentFrame = null;
+
+    webSocket.binaryType = 'arraybuffer';
+
+    webSocket.onmessage = event => {
+        if (frozen) return;
+
+        const blob = new Blob([event.data], { type: 'image/jpeg' });
+        const url = URL.createObjectURL(blob);
+        stream.src = url;
+        stream.onload = () => {
+            URL.revokeObjectURL(url);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(stream, 0, 0, canvas.width, canvas.height);
+        };
     };
 
-    document.getElementById('stop_stream_button').onclick = function() {
-        if (confirm('Are you sure you want to stop the stream?')) {
-            fetch(STOP_STREAM_URL, { method: 'POST' })
-                .then(response => {
-                    if (response.ok) {
-                        console.log('Stream stopped successfully!');
-                    } else {
-                        alert('Failed to stop the stream.');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('An error occurred while stopping the stream.');
-                });
-
-        }
+    webSocket.onopen = () => console.log('WebSocket connected');
+    webSocket.onclose = () => {
+        console.log('WebSocket closed');
+        setTimeout(() => location.reload(), 5000);
     };
+    webSocket.onerror = e => console.error('WebSocket error:', e);
+
+    let isDrawing = false;
+    let startX = 0, startY = 0;
+    let endX = 0, endY = 0;
+
+    canvas.addEventListener('mousedown', (e) => {
+        frozen = true;
+        isDrawing = true;
+        const rect = canvas.getBoundingClientRect();
+        startX = e.clientX - rect.left;
+        startY = e.clientY - rect.top;
+    });
+
+    canvas.addEventListener('mousemove', (e) => {
+        if (!isDrawing) return;
+        const rect = canvas.getBoundingClientRect();
+        endX = e.clientX - rect.left;
+        endY = e.clientY - rect.top;
+
+        // Redraw frame
+        ctx.drawImage(stream, 0, 0, canvas.width, canvas.height);
+        ctx.beginPath();
+        ctx.strokeStyle = 'red';
+        ctx.lineWidth = 2;
+        ctx.rect(startX, startY, endX - startX, endY - startY);
+        ctx.stroke();
+    });
+
+    canvas.addEventListener('mouseup', () => {
+        isDrawing = false;
+        console.log("Box selected:", {
+            x: startX,
+            y: startY,
+            width: endX - startX,
+            height: endY - startY
+        });
+    });
+
+    clearBtn.addEventListener('click', () => {
+        frozen = false;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    });
+
+    registerFrameBtn.addEventListener('click', () => {
+        const data = {
+            device_id: '{{ device.id }}',
+            x: Math.round(startX),
+            y: Math.round(startY),
+            width: Math.round(endX - startX),
+            height: Math.round(endY - startY),
+        };
+
+        fetch("{% url 'devices:register_frame' %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify(data)
+        }).then(res => {
+            if (!res.ok) throw new Error("Failed to register frame");
+        }).then(data => {
+            alert("Frame registered successfully!");
+            console.log(data);
+        }).catch(err => {
+            alert("Error registering frame");
+            console.error(err);
+        }).finally(() => {
+            frozen = false;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        });
+    });
 </script>
+
+<style>
+    #stream {
+        border: 2px solid #000;
+        border-radius: 10px;
+        margin-top: 20px;
+        display: block;
+    }
+    #canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 10;
+        border-radius: 10px;
+    }
+    #stream-container {
+        position: relative;
+        width: 640px;
+        height: 480px;
+    }
+</style>
 {% endblock %}

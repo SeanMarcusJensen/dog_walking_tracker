@@ -17,6 +17,9 @@ class Device(models.Model):
     
     def get_stream_url(self):
         return f"http://{self.ip}:{self.server_port}/stream"
+    
+    def get_websocket_url(self):
+        return f"ws://{self.ip}:{self.server_port}/stream/ws"
 
     def __str__(self):
-        return self.device_name
+        return self.name

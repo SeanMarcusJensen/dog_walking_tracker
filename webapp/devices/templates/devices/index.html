@@ -57,7 +57,14 @@
     </div>
     <div class="d-flex justify-content-center mt-3">
         <a href="{% url 'devices:export' %}" class="btn btn-secondary">Export Devices</a>
-        <a href="{% url 'devices:import' %}" class="btn btn-secondary ms-2">Import Devices</a>
+        <button
+            type="button"
+            class="btn btn-secondary ms-2"
+            data-bs-toggle="modal"
+            data-bs-target="#importDevicesModal"
+        >
+            Import Devices
+        </button>
         <button
             type="button"
             class="btn btn-success ms-2"
@@ -66,6 +73,34 @@
         >
             Register Device
         </button>
+    </div>
+
+    <div class="modal fade" id="importDevicesModal" tabindex="-1" aria-labelledby="importDevicesModal" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="importDeviceModalLabel">Import</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" action="{% url 'devices:import' %}">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="csv">CSV</label>
+                            <input type="file" class="form-control" id="csv" name="file" required>
+                        </div>
+                        <button
+                            type="submit"
+                            name="register"
+                            id="importDevices"
+                            class="btn btn-success mt-3"
+                        >
+                        Save
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 
 

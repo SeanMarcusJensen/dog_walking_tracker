@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from .models import Device
 
 # Create your views here.
@@ -48,8 +48,7 @@ def device_details(request, device_id):
         'created_at': device.created_at,
         'updated_at': device.updated_at,
         'stream_url': device.get_stream_url(),
-        'stop_url': device.get_stream_url() + '/stop',
-        'start_url': device.get_stream_url() + '/start',
+        'websocket_url': device.get_websocket_url(),
     }
     return render(request, 'devices/details.html', context={'device': device_details})
 
@@ -63,3 +62,12 @@ def import_data(request):
     # Logic to import device data
     # This could involve reading a file (e.g., CSV or JSON) and saving the data to the database
     pass
+
+def register_frame(request):
+    import json
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        id = data.get('device_id')
+        print(f"Device ID: {id}")
+        return redirect('devices:details', device_id=id)
+    return render(request, 'devices/index.html')
