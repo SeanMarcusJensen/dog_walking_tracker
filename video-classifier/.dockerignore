@@ -1,4 +1,5 @@
 # Ignore dev junk
+.venv
 __pycache__/
 *.pyc
 *.pyo
