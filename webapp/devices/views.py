@@ -76,7 +76,7 @@ def device_details(request, device_id):
         'updated_at': device.updated_at,
         'stream_url': device.get_stream_url(),
         'websocket_url': device.get_websocket_url(),
-        'door_frame': device.get_door_frame(),
+        'door_frame': device.get_door_frame()
     }
     return render(request, 'devices/details.html', context={'device': device_details})
 
