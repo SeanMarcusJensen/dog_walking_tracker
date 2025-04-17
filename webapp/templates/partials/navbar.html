@@ -18,6 +18,11 @@
                   Walks
                 </a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.app_name == 'devices' %}active-tab{% endif %}" href="{% url 'devices:index' %}">
+                  Devices
+                </a>
+            </li>
         </ul>
     </div>
 

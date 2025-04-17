@@ -6,54 +6,5 @@
 <div class='container'>
     <h1 class='text-primary text-center'>Dashboard</h1>
     <h2 class='text-secondary'>Welcome, {{ user.username }}!</h2>
-    <h3 class='text-secondary'>Live Stream</h3>
-    <img src="http://192.168.32.12:5000/video_feed/stream" width="640" height="480" />
-    <button class="btn btn-primary" id="start_stream_button">Start Stream</button>
-    <button class="btn btn-danger" id="stop_stream_button">Stop Stream</button>
 </div>
-
-<script>
-    BASE_URL = "http://192.168.32.12:5000"
-    STOP_STREAM_URL = BASE_URL + "/video_feed/stop"
-    START_STREAM_URL = BASE_URL + "/video_feed/start"
-
-    document.getElementById('start_stream_button').onclick = function() {
-        if (confirm('Are you sure you want to start the stream?')) {
-            fetch(START_STREAM_URL, { method: 'POST' })
-                .then(response => {
-                    if (response.ok) {
-                        alert('Stream started successfully!');
-                    } else {
-                        alert('Failed to start the stream.');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('An error occurred while starting the stream.');
-                })
-                .finally(() => {
-                    // Reload the page to refresh the stream
-                    window.location.reload();
-                });
-        }
-    };
-
-    document.getElementById('stop_stream_button').onclick = function() {
-        if (confirm('Are you sure you want to stop the stream?')) {
-            fetch(STOP_STREAM_URL, { method: 'POST' })
-                .then(response => {
-                    if (response.ok) {
-                        console.log('Stream stopped successfully!');
-                    } else {
-                        alert('Failed to stop the stream.');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('An error occurred while stopping the stream.');
-                });
-
-        }
-    };
-</script>
 {% endblock %}

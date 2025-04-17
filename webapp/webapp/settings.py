@@ -56,7 +56,7 @@ INSTALLED_APPS = [
     'dashboard',
     'videos',
     'walks',
-
+    'devices',
 ]
 
 MIDDLEWARE = [
