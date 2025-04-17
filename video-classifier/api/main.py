@@ -50,6 +50,8 @@ class CreateTaskRequest(BaseModel):
     video_url: str = Field(..., description="URL of the video to be processed")
     callback_url: str = Field(...,
                               description="URL to send the result back to")
+    device_id: int = Field(..., description="Unique identifier for the device")
+    frame_data: dict = Field(..., description="Frame data for the device")
 
 
 @app.post("/tasks/notify/", tags=["tasks"])
@@ -68,7 +70,9 @@ async def create_new_prediction_task(background_tasks: BackgroundTasks, request:
         classify_video_task,
         video_id=request.video_id,
         video_url=request.video_url,
-        callback_url=request.callback_url
+        callback_url=request.callback_url,
+        device_id=request.device_id,
+        frame_data=request.frame_data
     )
 
     # Simulate task creation and processing

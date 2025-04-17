@@ -1,5 +1,8 @@
 from django.shortcuts import render, redirect
 from .models import Device
+from django.utils import timezone
+import requests
+import json
 
 # Create your views here.
 
@@ -26,6 +29,30 @@ def register(request):
 
         # Save the device to the database
         device.save()
+
+        register_url = device.get_registration_url()
+        response = requests.post(
+            register_url,
+            data=json.dumps({
+                'device_id': device.id,
+                'device_name': device.name,
+            }),
+            headers={
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+            }
+        )
+        if response.status_code == 201:
+            # Handle successful registration
+            print("Device registered successfully.")
+            device.status = True
+            device.last_seen = timezone.now()
+            device.save()
+        else:
+            # Handle registration failure
+            print("Device registration failed.")
+            Device.objects.get(id=device.id).delete()
+            return redirect('devices:index')
         
         # Here you would typically save the device information to the database
         print(device.__dict__)  # For debugging purposes
@@ -49,6 +76,7 @@ def device_details(request, device_id):
         'updated_at': device.updated_at,
         'stream_url': device.get_stream_url(),
         'websocket_url': device.get_websocket_url(),
+        'door_frame': device.get_door_frame(),
     }
     return render(request, 'devices/details.html', context={'device': device_details})
 
@@ -68,6 +96,19 @@ def register_frame(request):
     if request.method == 'POST':
         data = json.loads(request.body)
         id = data.get('device_id')
+        print(f"DATA: {data}")
+
+        device = Device.objects.get(id=id)
+
+        device.update_door_frame(
+            x=data.get('x'),
+            y=data.get('y'),
+            width=data.get('width'),
+            height=data.get('height'),
+        )
+
+        device.save()
+        
         print(f"Device ID: {id}")
         return redirect('devices:details', device_id=id)
     return render(request, 'devices/index.html')

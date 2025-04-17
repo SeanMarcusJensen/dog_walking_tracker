@@ -6,7 +6,7 @@ from .services.hand_gesture_detection import detect_hand_gesture
 import time
 
 
-def classify_video_task(video_id: str, video_url: str, callback_url: str):
+def classify_video_task(video_id: str, video_url: str, callback_url: str, device_id: int, frame_data: dict):
     try:
         file_path = f"/tmp/video_{video_id}.mp4"
         print(f"Downloading video from {video_url} to {file_path}")
@@ -17,7 +17,7 @@ def classify_video_task(video_id: str, video_url: str, callback_url: str):
                 for chunk in r.iter_content(chunk_size=8192):
                     f.write(chunk)
 
-        inference_duration, direction, events = infere_video(file_path)
+        inference_duration, direction, events = infere_video(file_path, frame_data)
 
         """ We can calculate the weight of the events here.
         If the event has occurred more than 3 times, we can consider it as a significant event.
@@ -51,7 +51,7 @@ def classify_video_task(video_id: str, video_url: str, callback_url: str):
             "events": []})
 
 
-def infere_video(tmp_file):
+def infere_video(tmp_file, frame_data):
     # Mock example
     # Then load the file for your model
     logging.info("Running YOLOv11 model on video data")
@@ -60,7 +60,7 @@ def infere_video(tmp_file):
     start_time = time.time()
 
     # handle the video data with your model
-    status, events = detect_dog_direction(tmp_file, debug=False)
+    status, events = detect_dog_direction(tmp_file, frame_data, debug=False)
 
     end_time = time.time()
     infer_time = end_time - start_time

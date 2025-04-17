@@ -1,4 +1,5 @@
 from django.db import models
+from devices.models import Device
 
 # Create your models here.
 
@@ -10,6 +11,7 @@ class Walk(models.Model):
     # user = models.ForeignKey(
     #     'auth.User', related_name='walks', on_delete=models.CASCADE)
     id = models.AutoField(primary_key=True)
+    device = models.ForeignKey(Device, related_name='walks', on_delete=models.CASCADE)
     status = models.CharField(max_length=20, default='started', choices=[
         ('started', 'Started'),
         ('completed', 'Completed'),

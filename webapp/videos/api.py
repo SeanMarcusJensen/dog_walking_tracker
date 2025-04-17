@@ -10,14 +10,18 @@ from walks.models import Walk
 from django.utils.timezone import now
 
 from .models import Video
+from devices.models import Device
 
 
-def notify(video_id, video_url, callback):
+def notify(video_id, video_url, callback, device_id, frame_data):
     data = {
         "video_id": str(video_id),
         "video_url": video_url,
-        "callback_url": callback
+        "callback_url": callback,
+        "device_id": device_id,
+        "frame_data": frame_data
     }
+
     print(f"Nofitying Data: {data}")
 
     response = requests.post(settings.NOTIFY_URL, json=data)
@@ -30,20 +34,37 @@ class VideoUploadView(APIView):
     authentication_classes = [authentication.SessionAuthentication]
     # permission_classes = [permissions.IsAuthenticated]
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request, device_id:int, *args, **kwargs):
         serializer = VideoUploadSerializer(data=request.data)
 
         if not serializer.is_valid():
+            print("Invalid serializer data:", serializer.errors)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         video_file = serializer.validated_data['video']
-        video = Video.create_from_file(video_file)
+
+        device = Device.objects.get(id=device_id)
+        if not device:
+            return Response({"message": "Device not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        video = Video.create_from_file(device.id, video_file)
 
         try:
+            door_frame = device.get_door_frame()
+            dfd = {
+                'x': door_frame.x,
+                'y': door_frame.y,
+                'width': door_frame.width,
+                'height': door_frame.height
+            }
             task = notify(
                 video.id,
                 video_url=f"{settings.VIDEO_BASE_URL}{request.path}{video.id}",
-                callback=f"{settings.CALLBACK_BASE_URL}{request.path}{video.id}/")
+                callback=f"{settings.CALLBACK_BASE_URL}{request.path}{video.id}/",
+                device_id=device_id,
+                frame_data=dfd,
+            )
+
         except requests.RequestException as e:
             print("Error notifying callback URL:", e)
             return Response({"message": "Failed to notify callback URL."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -89,6 +110,7 @@ class VideoUploadView(APIView):
         elif prediction == "out":
             # Start a new walk
             walk = Walk.objects.create(
+                device=video.device,
                 start_time=now(),
                 status="started"
             )

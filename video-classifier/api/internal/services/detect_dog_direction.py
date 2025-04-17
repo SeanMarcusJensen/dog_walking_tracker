@@ -6,12 +6,19 @@ from .hand_gesture_detection import detect_hand_gesture
 model = YOLO("yolo11n.pt")
 
 
-def detect_dog_direction(video_path, debug=False):
+def detect_dog_direction(video_path, frame_data, debug=False):
     cap = cv2.VideoCapture(video_path)
     frame_width = int(cap.get(3))
     frame_height = int(cap.get(4))
+    door_frame_x = frame_data.get('x')
+    door_frame_y = frame_data.get('y')
+    door_frame_width = frame_data.get('width')
+    door_frame_height = frame_data.get('height')
+    door_frame = (door_frame_x, door_frame_y, door_frame_width, door_frame_height)
+    print(f"Door frame: {door_frame}")
 
     # Define door threshold (center line)
+    door_line_lower_y = door_frame_y + door_frame_height
     door_line_y = frame_height // 2 + 100
     previous_positions = []
     events = {}  # [event, count]
@@ -53,8 +60,8 @@ def detect_dog_direction(video_path, debug=False):
 
         # Finalize for debug(optional)
         if debug:
-            cv2.line(frame, (0, door_line_y),
-                     (frame_width, door_line_y), (255, 0, 0), 2)
+            cv2.line(frame, (0, door_line_lower_y),
+                     (frame_width, door_line_lower_y), (255, 0, 0), 2)
             cv2.imshow("Tracking", frame)
             if cv2.waitKey(1) == ord('q'):
                 break
@@ -70,9 +77,9 @@ def detect_dog_direction(video_path, debug=False):
     start = previous_positions[0]
     end = previous_positions[-1]
 
-    if start < door_line_y and end > door_line_y:
+    if start < door_line_lower_y and end > door_line_lower_y:
         return "in", events
-    elif start > door_line_y and end < door_line_y:
+    elif start > door_line_lower_y and end < door_line_lower_y:
         return "out", {}
     else:
         return "unknown", {}
