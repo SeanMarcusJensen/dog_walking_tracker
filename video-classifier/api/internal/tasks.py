@@ -26,9 +26,8 @@ def classify_video_task(video_id: str, video_url: str, callback_url: str, device
         significant_events = []
         for event, count in events.items():
             print(f"Event: {event}, Count: {count}")
-            significant_events.append(event)
-            # if count > 3:
-            # do not want duplicate events.
+            if count > 3:
+                significant_events.append(event)
 
         print(
             f"Sending significant events: {significant_events} to {callback_url}")
