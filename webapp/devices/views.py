@@ -42,6 +42,7 @@ def register(request):
                 'Accept': 'application/json',
             }
         )
+        
         if response.status_code == 201:
             # Handle successful registration
             print("Device registered successfully.")
@@ -55,8 +56,7 @@ def register(request):
             return redirect('devices:index')
         
         # Here you would typically save the device information to the database
-        print(device.__dict__)  # For debugging purposes
-        return render(request, 'devices/details.html', context=device.__dict__)
+        return redirect('devices:details', device_id=device.id)
 
     return render(request, 'devices/register.html')
 
