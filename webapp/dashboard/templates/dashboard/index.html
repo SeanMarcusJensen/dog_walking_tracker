@@ -10,12 +10,13 @@
 
     <div class="row">
         <div class="col">
-            <h2 class='text-secondary'>Last Walk</h2>
-            <p class='text-muted'>{{ last_walk.start_time }}</p>
+            <h2 class='text-secondary'>Last Walk:</h2>
+            <p class='text-muted'> was {{ last_walk.start_time }} ({{ last_walk.time_since|floatformat:0}} minutes ago)</p>
+            <p class='text-muted'> duration - {{ last_walk.duration |floatformat:0}} minutes</p>
         </div>
         <div class="col">
-            <h2 class='text-secondary'>Time since last walk</h2>
-            <p class='text-muted'>{{ last_walk.time_since}}</p>
+            <h2 class='text-secondary'>Time since last poop:</h2>
+            <p class='text-muted'>{{ events.time_since_last_poo |floatformat:0 }} minutes ago</p>
         </div>
     </div>
 </div>
