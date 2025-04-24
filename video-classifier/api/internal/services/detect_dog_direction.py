@@ -14,7 +14,8 @@ def detect_dog_direction(video_path, frame_data, debug=False):
     door_frame_y = frame_data.get('y')
     door_frame_width = frame_data.get('width')
     door_frame_height = frame_data.get('height')
-    door_frame = (door_frame_x, door_frame_y, door_frame_width, door_frame_height)
+    door_frame = (door_frame_x, door_frame_y,
+                  door_frame_width, door_frame_height)
     print(f"Door frame: {door_frame}")
 
     # Define door threshold (center line)
@@ -39,8 +40,6 @@ def detect_dog_direction(video_path, frame_data, debug=False):
 
             if label == "dog":
                 dog_boxes.append((x1, y1, x2, y2))
-            elif label == "door":  # Custom class — may not exist in default model
-                door_boxes.append((x1, y1, x2, y2))
             elif label == "person":
                 event = detect_hand_gesture(frame)
                 if event is None:
