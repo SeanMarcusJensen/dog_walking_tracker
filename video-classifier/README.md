@@ -25,13 +25,4 @@ Read more about them in the respected component folder.
                                            v
                              [POST result to webapp / PATCH]
 
-## Notes
-
-Could have used one api. But I wanted to have the inverse, because inference on the video is blocking for the video length. Thus Queue system.
-
-FineTuning of YOLO -> Had to use two models.
-
-Using two yolo models was hard to do. It took a long time to train for it to become any good - it must be other models that can do this better and faster.
-
-That is where MediaPipe Hands comes into the picture. It is efficient at key-pointing hands - we can thus use this to determine hand shape and fingers shown. The only problem now is that it detects hands, even when we're not explicitly showing the hand to the camera for signaling.we need functionality to fix this. (https://ai.google.dev/edge/mediapipe/solutions/vision/hand_landmarker)
 

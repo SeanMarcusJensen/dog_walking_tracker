@@ -34,7 +34,7 @@ class VideoUploadView(APIView):
     authentication_classes = [authentication.SessionAuthentication]
     # permission_classes = [permissions.IsAuthenticated]
 
-    def post(self, request, device_id:int, *args, **kwargs):
+    def post(self, request, device_id: int, *args, **kwargs):
         serializer = VideoUploadSerializer(data=request.data)
 
         if not serializer.is_valid():
@@ -77,7 +77,7 @@ class VideoUploadView(APIView):
             print("ID is None")
             return Response({"message": "ID is required."}, status=status.HTTP_400_BAD_REQUEST)
 
-        video = Video.objects.get(id=str(id))
+        video = Video.objects.get(id=id)
         if not video:
             return Response({"message": "Video not found."}, status=status.HTTP_404_NOT_FOUND)
 
